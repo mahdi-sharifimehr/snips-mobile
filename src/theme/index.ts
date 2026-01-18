@@ -6,6 +6,8 @@ export const theme = {
     text: '#FFFFFF',
     textMuted: '#B0B0B0',
     accent: '#FF2D55',
+    accentSoft: '#FF6B87',
+    overlay: 'rgba(0,0,0,0.35)',
   },
   spacing: {
     xs: 4,
@@ -18,5 +20,11 @@ export const theme = {
     sm: 10,
     md: 16,
     lg: 22,
+  },
+  fonts: {
+    regular: 'SpaceGrotesk_400Regular',
+    medium: 'SpaceGrotesk_500Medium',
+    semibold: 'SpaceGrotesk_600SemiBold',
+    bold: 'SpaceGrotesk_700Bold',
   },
 };

@@ -1,20 +1,40 @@
-import React from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, FlatList, StyleSheet, Text, View } from 'react-native';
 import type { HomeComponent, HomeTitle } from '../services/types';
 import { theme } from '../theme';
 import TitleCard from './TitleCard';
 
 type SectionRowProps = {
   section: HomeComponent;
+  index: number;
 };
 
-export default function SectionRow({ section }: SectionRowProps) {
+export default function SectionRow({ section, index }: SectionRowProps) {
   const size = section.componentType === 'LARGE_COVERS' ? 'large' : 'small';
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(12)).current;
+
+  useEffect(() => {
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 300,
+      delay: index * 80,
+      useNativeDriver: true,
+    }).start();
+
+    Animated.timing(translateY, {
+      toValue: 0,
+      duration: 300,
+      delay: index * 80,
+      useNativeDriver: true,
+    }).start();
+  }, [index, opacity, translateY]);
 
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, { opacity, transform: [{ translateY }] }]}>
       <View style={styles.header}>
         <Text style={styles.title}>{section.sectionTitle}</Text>
+        <Text style={styles.link}>See all</Text>
       </View>
       <FlatList<HomeTitle>
         horizontal
@@ -24,7 +44,7 @@ export default function SectionRow({ section }: SectionRowProps) {
         renderItem={({ item, index }) => <TitleCard item={item} size={size} index={index} />}
         contentContainerStyle={styles.listContent}
       />
-    </View>
+    </Animated.View>
   );
 }
 
@@ -35,11 +55,19 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: theme.spacing.lg,
     marginBottom: theme.spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   title: {
     color: theme.colors.text,
     fontSize: 20,
-    fontWeight: '700',
+    fontFamily: theme.fonts.semibold,
+  },
+  link: {
+    color: theme.colors.textMuted,
+    fontSize: 12,
+    fontFamily: theme.fonts.medium,
   },
   listContent: {
     paddingHorizontal: theme.spacing.lg,

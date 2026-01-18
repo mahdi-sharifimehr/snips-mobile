@@ -1,5 +1,7 @@
 import React from 'react';
 import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { theme } from '../theme';
 import type { FeedTitle } from '../services/types';
 import ExpandableText from './ExpandableText';
@@ -13,24 +15,31 @@ export default function FeedCard({ item, height }: FeedCardProps) {
   return (
     <View style={[styles.container, { height }]}>
       <ImageBackground source={{ uri: item.poster_url }} style={styles.image}>
-        <View style={styles.scrim} />
+        <LinearGradient
+          colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.75)']}
+          style={styles.scrim}
+        />
         <View style={styles.content}>
           <Text style={styles.title}>{item.name_en}</Text>
           <ExpandableText text={item.captions_en} />
           <View style={styles.ctaRow}>
             <Pressable style={styles.ctaButton}>
+              <Ionicons name="play" color={theme.colors.text} size={18} />
               <Text style={styles.ctaText}>Watch Now</Text>
             </Pressable>
           </View>
         </View>
         <View style={styles.actions}>
           <Pressable style={styles.actionButton}>
+            <Ionicons name="heart" size={18} color={theme.colors.text} />
             <Text style={styles.actionText}>Like</Text>
           </Pressable>
           <Pressable style={styles.actionButton}>
+            <Ionicons name="bookmark" size={18} color={theme.colors.text} />
             <Text style={styles.actionText}>Save</Text>
           </Pressable>
           <Pressable style={styles.actionButton}>
+            <Ionicons name="share-social" size={18} color={theme.colors.text} />
             <Text style={styles.actionText}>Share</Text>
           </Pressable>
         </View>
@@ -49,7 +58,6 @@ const styles = StyleSheet.create({
   },
   scrim: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.25)',
   },
   content: {
     paddingHorizontal: theme.spacing.lg,
@@ -59,7 +67,7 @@ const styles = StyleSheet.create({
   title: {
     color: theme.colors.text,
     fontSize: 22,
-    fontWeight: '700',
+    fontFamily: theme.fonts.bold,
     marginBottom: theme.spacing.sm,
   },
   ctaRow: {
@@ -69,29 +77,34 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.accent,
     borderRadius: 999,
     paddingVertical: 12,
+    paddingHorizontal: 18,
+    flexDirection: 'row',
     alignItems: 'center',
   },
   ctaText: {
     color: theme.colors.text,
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: theme.fonts.semibold,
+    marginLeft: 8,
   },
   actions: {
     position: 'absolute',
     right: theme.spacing.lg,
     bottom: theme.spacing.xl,
-    gap: theme.spacing.md,
   },
   actionButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: 'rgba(0,0,0,0.45)',
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: theme.spacing.md,
   },
   actionText: {
     color: theme.colors.text,
-    fontSize: 18,
+    fontSize: 10,
+    fontFamily: theme.fonts.medium,
+    marginTop: 4,
   },
 });

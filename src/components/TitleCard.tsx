@@ -1,5 +1,6 @@
 import React from 'react';
 import { ImageBackground, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { theme } from '../theme';
 import type { HomeTitle } from '../services/types';
 
@@ -18,11 +19,21 @@ export default function TitleCard({ item, size, index }: TitleCardProps) {
       {imageSource ? (
         <ImageBackground source={{ uri: imageSource }} style={styles.image} imageStyle={styles.imageRadius}>
           <View style={styles.overlay} />
+          <LinearGradient
+            colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.65)']}
+            style={styles.gradient}
+          />
           {showIndex ? (
             <Text style={styles.rank}>{index + 1}</Text>
           ) : null}
+          {item.tags?.[0] ? (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText} numberOfLines={1}>
+                {item.tags[0]}
+              </Text>
+            </View>
+          ) : null}
           <View style={styles.meta}>
-            {item.tags?.[0] ? <Text style={styles.tag}>{item.tags[0]}</Text> : null}
             <Text style={styles.title} numberOfLines={1}>
               {item.nameEn}
             </Text>
@@ -43,6 +54,11 @@ export default function TitleCard({ item, size, index }: TitleCardProps) {
 const styles = StyleSheet.create({
   card: {
     marginRight: theme.spacing.md,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6,
   },
   cardLarge: {
     width: 170,
@@ -57,31 +73,30 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   imageRadius: {
-    borderRadius: 16,
+    borderRadius: theme.radius.md,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    borderRadius: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.overlay,
+  },
+  gradient: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: theme.radius.md,
   },
   meta: {
     padding: theme.spacing.sm,
   },
-  tag: {
-    color: theme.colors.textMuted,
-    fontSize: 10,
-    textTransform: 'uppercase',
-    marginBottom: 2,
-  },
   title: {
     color: theme.colors.text,
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: theme.fonts.semibold,
   },
   genre: {
     color: theme.colors.textMuted,
     fontSize: 11,
     marginTop: 2,
+    fontFamily: theme.fonts.regular,
   },
   rank: {
     position: 'absolute',
@@ -89,10 +104,26 @@ const styles = StyleSheet.create({
     left: 10,
     color: theme.colors.text,
     fontSize: 32,
-    fontWeight: '800',
+    fontFamily: theme.fonts.bold,
     textShadowColor: 'rgba(0,0,0,0.6)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 6,
+  },
+  badge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: 'rgba(255, 45, 85, 0.85)',
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    maxWidth: 110,
+  },
+  badgeText: {
+    color: theme.colors.text,
+    fontSize: 10,
+    textTransform: 'uppercase',
+    fontFamily: theme.fonts.semibold,
   },
   fallback: {
     backgroundColor: theme.colors.surface,
@@ -103,7 +134,7 @@ const styles = StyleSheet.create({
   fallbackText: {
     color: theme.colors.text,
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: theme.fonts.semibold,
     textAlign: 'center',
   },
 });

@@ -14,6 +14,14 @@ export default function FeedScreen() {
     ({ item }: { item: FeedTitle }) => <FeedCard item={item} height={height} />,
     [height]
   );
+  const getItemLayout = useCallback(
+    (_: ArrayLike<FeedTitle> | null | undefined, index: number) => ({
+      length: height,
+      offset: height * index,
+      index,
+    }),
+    [height]
+  );
 
   if (loading) {
     return (
@@ -42,6 +50,9 @@ export default function FeedScreen() {
       snapToAlignment="start"
       decelerationRate="fast"
       style={styles.container}
+      getItemLayout={getItemLayout}
+      windowSize={3}
+      initialNumToRender={2}
     />
   );
 }
@@ -61,12 +72,13 @@ const styles = StyleSheet.create({
   errorTitle: {
     color: theme.colors.text,
     fontSize: 28,
-    fontWeight: '700',
+    fontFamily: theme.fonts.bold,
     marginBottom: theme.spacing.sm,
   },
   errorMessage: {
     color: theme.colors.textMuted,
     fontSize: 16,
     textAlign: 'center',
+    fontFamily: theme.fonts.regular,
   },
 });

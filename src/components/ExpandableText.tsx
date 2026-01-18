@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { LayoutAnimation, Platform, Pressable, StyleSheet, Text, UIManager, View } from 'react-native';
 import { theme } from '../theme';
 
 type ExpandableTextProps = {
@@ -10,6 +10,12 @@ type ExpandableTextProps = {
 export default function ExpandableText({ text, maxLength = 140 }: ExpandableTextProps) {
   const [expanded, setExpanded] = useState(false);
   const isLong = text.length > maxLength;
+
+  useEffect(() => {
+    if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+      UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+  }, []);
 
   const displayText = useMemo(() => {
     if (!isLong || expanded) {
@@ -26,7 +32,12 @@ export default function ExpandableText({ text, maxLength = 140 }: ExpandableText
     <View>
       <Text style={styles.text}>{displayText}</Text>
       {isLong ? (
-        <Pressable onPress={() => setExpanded((prev) => !prev)}>
+        <Pressable
+          onPress={() => {
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+            setExpanded((prev) => !prev);
+          }}
+        >
           <Text style={styles.action}>{expanded ? 'Less' : 'More'}</Text>
         </Pressable>
       ) : null}
@@ -39,11 +50,12 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     fontSize: 13,
     lineHeight: 18,
+    fontFamily: theme.fonts.regular,
   },
   action: {
     color: theme.colors.text,
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: theme.fonts.semibold,
     marginTop: 6,
   },
 });
