@@ -24,8 +24,8 @@ export default function RootNavigator() {
           paddingTop: 10,
           paddingBottom: 12,
         },
-        tabBarActiveTintColor: theme.colors.accent,
-        tabBarInactiveTintColor: theme.colors.textMuted,
+        tabBarActiveTintColor: theme.colors.text,
+        tabBarInactiveTintColor: '#8B8B8B',
         tabBarLabelStyle: {
           fontFamily: theme.fonts.medium,
           fontSize: 12,

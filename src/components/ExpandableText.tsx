@@ -30,7 +30,17 @@ export default function ExpandableText({ text, maxLength = 140 }: ExpandableText
 
   return (
     <View>
-      <Text style={styles.text}>{displayText}</Text>
+      <Pressable
+        onPress={() => {
+          if (!isLong) {
+            return;
+          }
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+          setExpanded((prev) => !prev);
+        }}
+      >
+        <Text style={styles.text}>{displayText}</Text>
+      </Pressable>
       {isLong ? (
         <Pressable
           onPress={() => {

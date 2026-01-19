@@ -1,5 +1,15 @@
-import React, { useCallback } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+  ViewToken,
+} from 'react-native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useIsFocused } from '@react-navigation/native';
 import FeedCard from '../components/FeedCard';
 import { useFeedData } from '../hooks/useFeedData';
 import type { FeedTitle } from '../services/types';
@@ -8,20 +18,67 @@ import { theme } from '../theme';
 export default function FeedScreen() {
   const { data, loading, error } = useFeedData();
   const { height } = useWindowDimensions();
+  const tabBarHeight = useBottomTabBarHeight();
+  const isFocused = useIsFocused();
   const feed = data?.feedTitles ?? [];
+  const [activeIndex, setActiveIndex] = useState(0);
+  const viewabilityConfig = useMemo(
+    () => ({
+      itemVisiblePercentThreshold: 80,
+    }),
+    []
+  );
+  const onViewableItemsChanged = useRef(
+    ({ viewableItems }: { viewableItems: Array<ViewToken> }) => {
+      const next = viewableItems.find((item) => item.isViewable);
+      if (next?.index != null) {
+        setActiveIndex(next.index);
+      }
+    }
+  );
+  const itemHeight = height - tabBarHeight;
+  const clampIndex = useCallback(
+    (index: number) => Math.max(0, Math.min(index, Math.max(feed.length - 1, 0))),
+    [feed.length]
+  );
 
   const renderItem = useCallback(
-    ({ item }: { item: FeedTitle }) => <FeedCard item={item} height={height} />,
-    [height]
+    ({ item, index }: { item: FeedTitle; index: number }) => (
+      <FeedCard
+        item={item}
+        height={itemHeight}
+        isActive={index === activeIndex}
+        isScreenFocused={isFocused}
+        bottomOffset={tabBarHeight}
+      />
+    ),
+    [activeIndex, isFocused, itemHeight, tabBarHeight]
   );
   const getItemLayout = useCallback(
     (_: ArrayLike<FeedTitle> | null | undefined, index: number) => ({
-      length: height,
-      offset: height * index,
+      length: itemHeight,
+      offset: itemHeight * index,
       index,
     }),
-    [height]
+    [itemHeight]
   );
+  const handleMomentumEnd = useCallback(
+    (event: { nativeEvent: { contentOffset: { y: number } } }) => {
+      const offsetY = event.nativeEvent.contentOffset.y;
+      const nextIndex = Math.round(offsetY / itemHeight);
+      setActiveIndex(clampIndex(nextIndex));
+    },
+    [clampIndex, itemHeight]
+  );
+  const handleScrollBeginDrag = useCallback(() => {
+    setActiveIndex(-1);
+  }, []);
+
+  useEffect(() => {
+    if (!isFocused) {
+      setActiveIndex(-1);
+    }
+  }, [isFocused]);
 
   if (loading) {
     return (
@@ -53,6 +110,10 @@ export default function FeedScreen() {
       getItemLayout={getItemLayout}
       windowSize={3}
       initialNumToRender={2}
+      viewabilityConfig={viewabilityConfig}
+      onViewableItemsChanged={onViewableItemsChanged.current}
+      onMomentumScrollEnd={handleMomentumEnd}
+      onScrollBeginDrag={handleScrollBeginDrag}
     />
   );
 }
