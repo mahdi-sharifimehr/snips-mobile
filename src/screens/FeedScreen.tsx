@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useIsFocused } from '@react-navigation/native';
-import FeedCard from '../components/FeedCard';
+import FeedCardContainer from '../containers/FeedCardContainer';
 import { useFeedData } from '../hooks/useFeedData';
 import type { FeedTitle } from '../services/types';
 import { theme } from '../theme';
@@ -26,7 +26,7 @@ export default function FeedScreen() {
     () => ({
       itemVisiblePercentThreshold: 80,
     }),
-    []
+    [],
   );
   const onViewableItemsChanged = useRef(
     ({ viewableItems }: { viewableItems: Array<ViewToken> }) => {
@@ -34,17 +34,17 @@ export default function FeedScreen() {
       if (next?.index != null) {
         setActiveIndex(next.index);
       }
-    }
+    },
   );
   const itemHeight = height - tabBarHeight;
   const clampIndex = useCallback(
     (index: number) => Math.max(0, Math.min(index, Math.max(feed.length - 1, 0))),
-    [feed.length]
+    [feed.length],
   );
 
   const renderItem = useCallback(
     ({ item, index }: { item: FeedTitle; index: number }) => (
-      <FeedCard
+      <FeedCardContainer
         item={item}
         height={itemHeight}
         isActive={index === activeIndex}
@@ -52,7 +52,7 @@ export default function FeedScreen() {
         bottomOffset={tabBarHeight}
       />
     ),
-    [activeIndex, isFocused, itemHeight, tabBarHeight]
+    [activeIndex, isFocused, itemHeight, tabBarHeight],
   );
   const getItemLayout = useCallback(
     (_: ArrayLike<FeedTitle> | null | undefined, index: number) => ({
@@ -60,7 +60,7 @@ export default function FeedScreen() {
       offset: itemHeight * index,
       index,
     }),
-    [itemHeight]
+    [itemHeight],
   );
   const handleMomentumEnd = useCallback(
     (event: { nativeEvent: { contentOffset: { y: number } } }) => {
@@ -68,7 +68,7 @@ export default function FeedScreen() {
       const nextIndex = Math.round(offsetY / itemHeight);
       setActiveIndex(clampIndex(nextIndex));
     },
-    [clampIndex, itemHeight]
+    [clampIndex, itemHeight],
   );
   const handleScrollBeginDrag = useCallback(() => {
     setActiveIndex(-1);
@@ -110,6 +110,8 @@ export default function FeedScreen() {
       getItemLayout={getItemLayout}
       windowSize={3}
       initialNumToRender={2}
+      maxToRenderPerBatch={3}
+      removeClippedSubviews
       viewabilityConfig={viewabilityConfig}
       onViewableItemsChanged={onViewableItemsChanged.current}
       onMomentumScrollEnd={handleMomentumEnd}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHomeData } from '../hooks/useHomeData';
@@ -8,8 +8,14 @@ import SectionRow from '../components/SectionRow';
 
 export default function HomeScreen() {
   const { data, loading, error } = useHomeData();
-  const sections = data?.data.components ?? [];
+  const sections = useMemo(() => data?.data.components ?? [], [data]);
   const insets = useSafeAreaInsets();
+  const renderItem = useCallback(
+    ({ item, index }: { item: HomeComponent; index: number }) => (
+      <SectionRow section={item} index={index} />
+    ),
+    []
+  );
 
   if (loading) {
     return (
@@ -33,11 +39,13 @@ export default function HomeScreen() {
       <FlatList<HomeComponent>
         data={sections}
         keyExtractor={(item, index) => `${item.id}-${index}`}
-        renderItem={({ item, index }) => <SectionRow section={item} index={index} />}
+        renderItem={renderItem}
         contentContainerStyle={[styles.listContent, { paddingTop: insets.top + theme.spacing.md }]}
         showsVerticalScrollIndicator={false}
         windowSize={4}
         initialNumToRender={3}
+        maxToRenderPerBatch={4}
+        removeClippedSubviews
       />
     </View>
   );

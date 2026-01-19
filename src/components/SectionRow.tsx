@@ -62,16 +62,16 @@ export default function SectionRow({ section, index }: SectionRowProps) {
         renderItem={({ item, index }) => {
           if (isMoreTitles && item.id === 'explore-more') {
             return (
-            <View style={[styles.moreItem, { width: moreItemWidth }]}>
-              <View style={[styles.exploreCard, { height: moreItemHeight }]}>
-                <Ionicons name="play-circle" size={28} color={theme.colors.textMuted} />
-                <Text style={styles.exploreText}>Explore more</Text>
+              <View style={[styles.moreItem, { width: moreItemWidth }]}>
+                <View style={[styles.exploreCard, { height: moreItemHeight }]}>
+                  <Ionicons name="play-circle" size={28} color={theme.colors.textMuted} />
+                  <Text style={styles.exploreText}>Explore more</Text>
+                </View>
               </View>
-            </View>
-          );
-        }
+            );
+          }
 
-        return (
+          return (
             <View
               style={[
                 isMoreTitles ? styles.moreItem : isRegular ? styles.regularItem : undefined,
@@ -84,7 +84,9 @@ export default function SectionRow({ section, index }: SectionRowProps) {
                 index={index}
                 isTopTen={isTopTen}
                 showMetaInside={!isRegular && !isMoreTitles}
-                cardSize={isMoreTitles ? { width: moreItemWidth, height: moreItemHeight } : undefined}
+                cardSize={
+                  isMoreTitles ? { width: moreItemWidth, height: moreItemHeight } : undefined
+                }
               />
               {isRegular ? (
                 <View style={styles.regularMeta}>
@@ -105,7 +107,10 @@ export default function SectionRow({ section, index }: SectionRowProps) {
         numColumns={isMoreTitles ? 2 : 1}
         columnWrapperStyle={
           isMoreTitles
-            ? [styles.moreColumn, { width: moreGridWidth, alignSelf: 'center', columnGap: theme.spacing.md }]
+            ? [
+                styles.moreColumn,
+                { width: moreGridWidth, alignSelf: 'center', columnGap: theme.spacing.md },
+              ]
             : undefined
         }
         showsVerticalScrollIndicator={false}

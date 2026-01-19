@@ -39,10 +39,16 @@ export default function TitleCard({
       ]}
     >
       {imageSource ? (
-        <ImageBackground source={{ uri: imageSource }} style={styles.image} imageStyle={styles.imageRadius}>
+        <ImageBackground
+          source={{ uri: imageSource }}
+          style={styles.image}
+          imageStyle={styles.imageRadius}
+        >
           <LinearGradient
             colors={
-              isTopTen ? ['rgba(0,0,0,0)', 'rgba(0,0,0,0.75)'] : ['rgba(0,0,0,0)', 'rgba(0,0,0,0.55)']
+              isTopTen
+                ? ['rgba(0,0,0,0)', 'rgba(0,0,0,0.75)']
+                : ['rgba(0,0,0,0)', 'rgba(0,0,0,0.55)']
             }
             locations={[0.55, 1]}
             style={styles.bottomFade}
@@ -70,15 +76,15 @@ export default function TitleCard({
           ) : null}
           {showMetaInside ? (
             <View style={styles.meta}>
-            {item.genres?.length ? (
-              <Text
-                style={[styles.genre, isTopTen && styles.genreTopTen]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {item.genres.join(', ')}
-              </Text>
-            ) : null}
+              {item.genres?.length ? (
+                <Text
+                  style={[styles.genre, isTopTen && styles.genreTopTen]}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {item.genres.join(', ')}
+                </Text>
+              ) : null}
               <Text
                 style={[styles.title, isLarge && styles.titleLarge, isTopTen && styles.titleTopTen]}
                 numberOfLines={1}

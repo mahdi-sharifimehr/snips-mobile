@@ -1,120 +1,42 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ResizeMode, Video } from 'expo-av';
-import { theme } from '../theme';
-import type { FeedTitle } from '../services/types';
-import ExpandableText from './ExpandableText';
+import { theme } from '../../theme';
+import ExpandableText from '../ExpandableText';
 
-type FeedCardProps = {
-  item: FeedTitle;
+type FeedCardViewProps = {
   height: number;
-  isActive: boolean;
-  isScreenFocused: boolean;
   bottomOffset: number;
+  title: string;
+  description: string;
+  video: React.ReactNode;
+  showPlayOverlay: boolean;
+  onTogglePlayback: () => void;
 };
 
-export default function FeedCard({
-  item,
+export default function FeedCardView({
   height,
-  isActive,
-  isScreenFocused,
   bottomOffset,
-}: FeedCardProps) {
-  const videoRef = useRef<Video | null>(null);
-  const toggleLock = useRef(false);
-  const [userPaused, setUserPaused] = useState(false);
-  const shouldPlay = useMemo(
-    () => isActive && isScreenFocused && !userPaused,
-    [isActive, isScreenFocused, userPaused]
-  );
-
-  useEffect(() => {
-    if (!videoRef.current) {
-      return;
-    }
-    if (isActive) {
-      setUserPaused(false);
-      videoRef.current.setPositionAsync(0).catch(() => undefined);
-    } else {
-      videoRef.current.pauseAsync().catch(() => undefined);
-    }
-  }, [isActive]);
-
-  useEffect(() => {
-    if (!isScreenFocused) {
-      videoRef.current?.pauseAsync().catch(() => undefined);
-    }
-  }, [isScreenFocused]);
-
-  useEffect(() => {
-    if (!videoRef.current || !isActive || !isScreenFocused) {
-      return;
-    }
-    if (userPaused) {
-      videoRef.current.pauseAsync().catch(() => undefined);
-      videoRef.current.setStatusAsync({ shouldPlay: false }).catch(() => undefined);
-    } else {
-      videoRef.current.playAsync().catch(() => undefined);
-    }
-  }, [isActive, isScreenFocused, userPaused]);
-
-  const handleTogglePlayback = useCallback(async () => {
-    if (!isActive || !videoRef.current) {
-      return;
-    }
-    if (toggleLock.current) {
-      return;
-    }
-    toggleLock.current = true;
-    try {
-      const status = await videoRef.current.getStatusAsync();
-      if (status.isLoaded) {
-        if (status.isPlaying) {
-          setUserPaused(true);
-          await videoRef.current.pauseAsync();
-          await videoRef.current.setStatusAsync({ shouldPlay: false });
-        } else {
-          setUserPaused(false);
-          await videoRef.current.playAsync();
-        }
-      }
-    } catch {
-      // Swallow toggle race errors; state will reconcile on next tick.
-    } finally {
-      toggleLock.current = false;
-    }
-  }, [isActive]);
-
+  title,
+  description,
+  video,
+  showPlayOverlay,
+  onTogglePlayback,
+}: FeedCardViewProps) {
   return (
     <View style={[styles.container, { height }]}>
-      <View style={styles.videoWrapper}>
-        <Video
-          ref={videoRef}
-          source={{ uri: item.video_playback_url }}
-          posterSource={{ uri: item.poster_url }}
-          posterStyle={styles.videoPoster}
-          style={styles.video}
-          resizeMode={ResizeMode.COVER}
-          shouldPlay={shouldPlay}
-          isLooping
-          isMuted={false}
-        />
-        {isActive && userPaused ? (
-          <View style={styles.playOverlay}>
-            <Ionicons name="play" size={48} color={theme.colors.text} />
-          </View>
-        ) : null}
-      </View>
-      <Pressable style={styles.overlay} onPress={handleTogglePlayback}>
-        <LinearGradient
-          colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.75)']}
-          style={styles.scrim}
-        />
+      <View style={styles.videoWrapper}>{video}</View>
+      {showPlayOverlay ? (
+        <View style={styles.playOverlay}>
+          <Ionicons name="play" size={48} color={theme.colors.text} />
+        </View>
+      ) : null}
+      <Pressable style={styles.overlay} onPress={onTogglePlayback}>
+        <LinearGradient colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.75)']} style={styles.scrim} />
         <View style={styles.content}>
-          <Text style={styles.title}>{item.name_en}</Text>
-          <ExpandableText text={item.captions_en} />
+          <Text style={styles.title}>{title}</Text>
+          <ExpandableText text={description} />
         </View>
         <Pressable
           style={[
@@ -181,13 +103,6 @@ const styles = StyleSheet.create({
   videoWrapper: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: theme.colors.background,
-  },
-  video: {
-    width: '100%',
-    height: '100%',
-  },
-  videoPoster: {
-    resizeMode: 'cover',
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
