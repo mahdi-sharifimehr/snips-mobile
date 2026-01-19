@@ -52,6 +52,35 @@ npm run format
 - **Performance**: list settings include `getItemLayout`, `removeClippedSubviews`,
   and tuned render batch sizes for smoother scrolling.
 
+## Architecture Decisions
+
+### Why Expo?
+
+- Simplified development workflow and native module integration.
+- Over-the-air updates support.
+- Fast iteration with hot reload.
+- Strong built-in support for common native features.
+
+### Why Hooks + Local State (instead of a global store)?
+
+- The app has two screens with scoped state; keeping state local reduces complexity.
+- Data fetching is encapsulated in dedicated hooks for clarity and testability.
+- Avoids premature global state until the app truly needs it.
+
+### Why FlatList (for this scope)?
+
+- The data set is moderate and the list is paged for the Feed screen.
+- Performance is already tuned with `getItemLayout`, `removeClippedSubviews`,
+  and smaller render batches.
+- If the app grows, FlashList would be a good upgrade path.
+
+### Why Expo AV (current choice)?
+
+- It is stable and works reliably with the Expo SDK used in this project.
+- Supports the streaming use case needed for the Feed screen.
+- If the project requires more advanced controls or newer APIs, Expo Video would be
+  a good next step.
+
 ## API Endpoints
 
 - Home: `https://snips-testing-data.s3.us-east-2.amazonaws.com/homePage.json`
@@ -62,7 +91,3 @@ npm run format
 - Buttons on the Feed screen are visually mocked per task requirements.
 - Only one feed video plays at a time; playback pauses when leaving the Feed tab.
 - Some API fields are ignored when not required by the provided Figma design.
-
-## Project Structure
-
-```\n+src/\n+  app/            # navigation setup\n+  components/     # reusable UI pieces\n+  components/feed/# feed-specific presentational UI\n+  containers/     # stateful containers\n+  hooks/          # data fetching hooks\n+  screens/        # Home / Feed screens\n+  services/       # API client + endpoints\n+  theme/          # design tokens\n+```
