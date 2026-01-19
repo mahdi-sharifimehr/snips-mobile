@@ -14,7 +14,7 @@ export default function HomeScreen() {
     ({ item, index }: { item: HomeComponent; index: number }) => (
       <SectionRow section={item} index={index} />
     ),
-    []
+    [],
   );
 
   if (loading) {
